@@ -1,0 +1,37 @@
+version: "1"
+
+package:
+  id: io.github.recrossable
+  name: recrossable
+  version: 0.0.0.1
+  kind: app
+  description: |
+    crossword game with simplistic handwriting recognition and automatic generation of crosswords
+
+command:
+  - /opt/apps/io.github.recrossable/files/bin/recrossable
+
+base: org.deepin.foundation/23.0.0
+runtime: org.deepin.Runtime/23.0.1
+
+sources:
+  - kind: git
+    url: https://github.com/wjyrich/recrossable.git
+    version: master
+    commit: 9a4cfb9fabccd20b14887b9b415821e49bd0e6ba
+  - kind: git
+    url: https://github.com/davisking/dlib.git
+    version: master
+    commit: 62ad0416a4df91d8326be94a81e6789273e8f8e9
+build: |
+  cd /project/linglong/sources/dlib.git
+  mkdir build
+  cd build
+  cmake .. \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX}
+  cmake --build . --target install -j$(nproc --all)
+
+  cd /project/linglong/sources/recrossable.git
+  qmake -makefile PREFIX=${PREFIX} LIB_INSTALL_DIR=${PREFIX}/lib/${TRIPLET}
+  make -j$(nproc)
+  make install
